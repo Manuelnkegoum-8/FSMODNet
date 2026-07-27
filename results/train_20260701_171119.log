@@ -1,0 +1,6 @@
+2026-07-01 17:11:20,583 [INFO] timm.models._builder: Loading pretrained weights from Hugging Face hub (timm/vit_small_plus_patch16_dinov3.lvd1689m)
+2026-07-01 17:11:20,707 [INFO] timm.models._hub: [timm/vit_small_plus_patch16_dinov3.lvd1689m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-07-01 17:11:21,224 [INFO] timm.models._builder: Loading pretrained weights from Hugging Face hub (timm/vit_small_plus_patch16_dinov3.lvd1689m)
+2026-07-01 17:11:21,347 [INFO] timm.models._hub: [timm/vit_small_plus_patch16_dinov3.lvd1689m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-07-01 17:11:22,557 [WARNING] engine.hooks: Prototypes not computed. Computing prototypes...
+2026-07-01 17:11:22,558 [INFO] engine.hooks: Computing prototypes...
