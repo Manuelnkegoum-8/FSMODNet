@@ -62,23 +62,12 @@ data/M3FD/
 ### Base training
 We take FLIR as example. First, create meta_learning.sh and copy the following commands to it.
 ```bash
-dataset='FLIR'
+dataset=flir
 split=1
-spectrum='both'
-backbone='Resnet'
-data_dir='data/'${dataset}
-root='exps'
-mkdir -p $root
-output_dir=$root/${dataset}/split${split}/${backbone}/${spectrum}
-ckpt=$output_dir/meta_learning/detector.ckpt
-mkdir -p $output_dir/meta_learning
-
-python training.py \
-        --config configs/FLIR/Resnet_stage2.py \
-        --output_dir $output_dir --data_dir $data_dir \
-        --split $split --spectrum $spectrum --dataset $dataset \
-        --stage 2 \
-	    2>&1 | tee ${output_dir}/meta_learning/log.txt
+backbone=resnet50
+exps_dir=exps
+output_dir=$exps_dir/${dataset}/split${split}/${backbone}
+python training.py --config configs/fsmodnet/meta_learning/${dataset}_${split}.py --output_dir $output_dir
 ```
 Then run the command below
 ```bash
@@ -88,25 +77,23 @@ Then run the command below
 ### Few-shot finetuning
 We take FLIR as example. First, create fs.sh and copy the following commands to it.
 ```bash
-dataset='FLIR'
+dataset=flir
 split=1
-seed=1
-kshot=10
-spectrum='both'
-backbone='Resnet'
-data_dir='data/'${dataset}
-root='exps'
-output_dir=$root/${dataset}/split${split}/${backbone}/${spectrum}
-ckpt=$output_dir/meta_learning/detector.ckpt
-mkdir -p ${output_dir}/${kshot}_shot
+spectrum=both
+backbone=resnet50
+exps_dir=exps
+ckpt=$exps_dir/${dataset}/split${split}/${backbone}/detector.ckpt
 
-python training.py \
-        --config configs/FLIR/Resnet_stage3.py \
-        --output_dir $output_dir --data_dir $data_dir \
-        --split $split --spectrum $spectrum --dataset $dataset \
-        --stage 3 --checkpoint $ckpt --k_shot $kshot \
-        --warmup_steps 100 --seed $seed   \
-	    2>&1 | tee ${output_dir}/${kshot}_shot/log_$seed.txt
+for shot in 5 10
+do
+for seed in 1 2 3 4 5 6 7 8 9 10
+do
+output_dir=$exps_dir/${dataset}/split${split}/${backbone}/${shot}shot/seed${seed}
+python training.py  --config configs/fsmodnet/meta_learning/few_shot/${dataset}_${split}.py  --output_dir $output_dir --checkpoint $ckpt \
+    --cfg-options train_data.ann_file=few_shot/seed${seed}/${shot}.json  support_data.ann_file=few_shot/seed${seed}/${shot}.json
+done
+done
+
 ```
 Then run the command below
 ```bash
