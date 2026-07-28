@@ -8,7 +8,7 @@ By effectively combining the unique strengths of visible and thermal imagery usi
 
 ## 📷 Overview
 <p align="center">
-        <img src="figs/fsmodnet.png" alt="FSMODNet Framework" width="50%">
+        <img src="figs/fsmodnet.png" alt="FSMODNet Framework" width="90%">
 </p>
 
 ## 🧩 Installation
