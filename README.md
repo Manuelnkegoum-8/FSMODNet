@@ -12,8 +12,9 @@ By effectively combining the unique strengths of visible and thermal imagery usi
 </p>
 
 ## 🧩 Installation
-1. Download this repo
+1. Clone this repo
 ```bash
+git clone https://github.com/Manuelnkegoum-8/FSMODNet.git
 cd FSMODNet
 ```
 2. Install required packages
