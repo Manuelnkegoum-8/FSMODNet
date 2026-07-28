@@ -1,20 +1,22 @@
-mean = [123.675, 116.28, 103.53]
-std = [58.395, 57.12, 57.375]
+mean = [0.0, 0.0, 0.0]
+std = [255.0, 255.0, 255.0]
 num_classes = 3
 episode_size = 1
-num_episodes = 3
+num_episodes = 2
 model = dict(
     type='DINO',
     backbone=dict(
-        type='TimmDINOModel',
-        model='hf_hub:timm/vit_small_plus_patch16_dinov3.lvd1689m',
-        n=1,
-        reshape=True,
-        return_class_token=False,
-        feature_levels=[1, 2, 3]),
+        type='PResNet',
+        depth=50,
+        num_stages=4,
+        return_idx=(1, 2, 3),
+        freeze_at=0,
+        freeze_norm=True,
+        checkpoint_dir='../coco_pretrained_weights/',
+        pretrained=True),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[192, 384, 384],
+        in_channels=[512, 1024, 2048],
         out_channels=256,
         num_outs=4,
         bias=True,
@@ -86,7 +88,7 @@ model = dict(
         num_queries=900,
         num_feature_levels=4),
     episode_size=1,
-    num_episodes=3,
+    num_episodes=2,
     embed_dim=256,
     num_classes=3,
     num_queries=900,
@@ -130,11 +132,7 @@ train_pipeline = [
     dict(type='LoadMSImagesFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='MSPhotoMetricDistortion', prob=0.5),
-    dict(
-        type='MSExpand',
-        mean=[123.675, 116.28, 103.53],
-        prob=0.5,
-        ratio_range=(1, 4)),
+    dict(type='MSExpand', mean=[0.0, 0.0, 0.0], prob=0.5, ratio_range=(1, 4)),
     dict(type='MSRandomIoUCrop', prob=0.8),
     dict(type='FilterAnnotations', min_wh=(0.01, 0.01)),
     dict(type='MSResize', scale=(640, 640), keep_ratio=False),
@@ -167,7 +165,7 @@ test_pipeline = [
 train_data = dict(
     type='Few_shot_CocoDetection_RGBT',
     root='../datasets/FLIR/',
-    ann_file='few_shot/seed2/5.json',
+    ann_file='Coco_annotations/Train_Annotations.json',
     data_prefix=dict(img_rgb='JPEGImages/', img_ir='JPEGImages/'),
     transforms=[
         dict(type='LoadMSImagesFromFile'),
@@ -175,7 +173,7 @@ train_data = dict(
         dict(type='MSPhotoMetricDistortion', prob=0.5),
         dict(
             type='MSExpand',
-            mean=[123.675, 116.28, 103.53],
+            mean=[0.0, 0.0, 0.0],
             prob=0.5,
             ratio_range=(1, 4)),
         dict(type='MSRandomIoUCrop', prob=0.8),
@@ -197,7 +195,7 @@ train_data = dict(
             meta_keys=('img_id', 'img_path_rgb', 'img_path_ir', 'ori_shape',
                        'img_shape', 'scale_factor', 'flip', 'flip_direction'))
     ],
-    stage='few_shot_finetune',
+    stage='meta_learning',
     n_way=5,
     num_shots=1,
     min_area_support=256,
@@ -210,48 +208,8 @@ train_data = dict(
         mapping=dict(bicycle=1, car=2, person=3),
         palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)]),
     test_mode=False,
-    max_refetch=100,
-    with_support=True)
+    max_refetch=100)
 val_data = dict(
-    type='Few_shot_CocoDetection_RGBT',
-    root='../datasets/FLIR/',
-    ann_file='Coco_annotations/Val_Annotations.json',
-    data_prefix=dict(img_rgb='JPEGImages/', img_ir='JPEGImages/'),
-    transforms=[
-        dict(type='LoadMSImagesFromFile'),
-        dict(type='LoadAnnotations', with_bbox=True),
-        dict(type='MSFixScaleResize', scale=(640, 640), keep_ratio=False),
-        dict(
-            type='MSPackDetInputs',
-            meta_keys=('img_id', 'img_path_rgb', 'img_path_ir', 'ori_shape',
-                       'img_shape', 'scale_factor', 'flip', 'flip_direction',
-                       'text', 'custom_entities'))
-    ],
-    support_transforms=[
-        dict(type='LoadMSImagesFromFile'),
-        dict(type='LoadAnnotations', with_bbox=True),
-        dict(type='MSHorizontalFlip', prob=0.5),
-        dict(type='MSResize', scale=(640, 640), keep_ratio=False),
-        dict(
-            type='MSPackDetInputs',
-            meta_keys=('img_id', 'img_path_rgb', 'img_path_ir', 'ori_shape',
-                       'img_shape', 'scale_factor', 'flip', 'flip_direction'))
-    ],
-    stage='few_shot_finetune',
-    n_way=5,
-    num_shots=1,
-    min_area_support=256,
-    key_rgb='file_name_RGB',
-    key_ir='file_name_IR',
-    meta_info=dict(
-        ALL_CLASSES=('bicycle', 'car', 'person'),
-        BASE_CLASSES=('bicycle', 'car'),
-        NOVEL_CLASSES=('person', ),
-        mapping=dict(bicycle=1, car=2, person=3),
-        palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)]),
-    test_mode=True,
-    with_support=False)
-test_data = dict(
     type='Few_shot_CocoDetection_RGBT',
     root='../datasets/FLIR/',
     ann_file='Coco_annotations/Val_Annotations.json',
@@ -289,14 +247,14 @@ test_data = dict(
         mapping=dict(bicycle=1, car=2, person=3),
         palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)]),
     test_mode=True)
+test_data = None
 support_test_pipeline = [
     dict(type='LoadMSImagesFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='MSResize', scale=(640, 640), keep_ratio=False),
     dict(
-        type='NormalizeImage',
-        mean=[123.675, 116.28, 103.53],
-        std=[58.395, 57.12, 57.375]),
+        type='NormalizeImage', mean=[0.0, 0.0, 0.0], std=[255.0, 255.0,
+                                                          255.0]),
     dict(
         type='MSPackDetInputs',
         meta_keys=('img_id', 'img_path_rgb', 'img_path_ir', 'ori_shape',
@@ -313,7 +271,7 @@ support_data = dict(
         NOVEL_CLASSES=('person', ),
         mapping=dict(bicycle=1, car=2, person=3),
         palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)]),
-    ann_file='few_shot/seed2/5.json',
+    ann_file='Coco_annotations/Train_Annotations.json',
     data_prefix=dict(img_rgb='JPEGImages/', img_ir='JPEGImages/'),
     transforms=[
         dict(type='LoadMSImagesFromFile'),
@@ -321,15 +279,15 @@ support_data = dict(
         dict(type='MSResize', scale=(640, 640), keep_ratio=False),
         dict(
             type='NormalizeImage',
-            mean=[123.675, 116.28, 103.53],
-            std=[58.395, 57.12, 57.375]),
+            mean=[0.0, 0.0, 0.0],
+            std=[255.0, 255.0, 255.0]),
         dict(
             type='MSPackDetInputs',
             meta_keys=('img_id', 'img_path_rgb', 'img_path_ir', 'ori_shape',
                        'img_shape', 'scale_factor', 'flip', 'flip_direction'))
     ],
     min_area_support=256,
-    stage='few_shot_finetune')
+    stage='meta_learning')
 metric = dict(
     type='CocoMetric',
     classwise=True,
@@ -340,41 +298,21 @@ metric = dict(
         mapping=dict(bicycle=1, car=2, person=3),
         palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)]),
     proposal_nums=(100, 1, 10),
-    stage='few_shot_finetune',
+    stage='meta_learning',
     ann_file='../datasets/FLIR/Coco_annotations/Val_Annotations.json',
     metric='bbox')
 custom_callbacks = [
-    dict(
-        type='TrainableParamsHook',
-        stage='few_shot_finetune',
-        metainfo=dict(
-            ALL_CLASSES=('bicycle', 'car', 'person'),
-            BASE_CLASSES=('bicycle', 'car'),
-            NOVEL_CLASSES=('person', ),
-            mapping=dict(bicycle=1, car=2, person=3),
-            palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)]),
-        Ignore_params=['backbone', 'reference_points', 'sampling_offsets']),
+    dict(type='TrainableParamsHook', Ignore_params=[]),
     dict(type='PrototypeCallback', episode_size=1, max_iters=100),
-    dict(
-        type='SaveFewShotMetricsCallback',
-        monitor='coco/novel_map_50',
-        rule='greater',
-        summary_file='flir_fewshot.csv'),
-    dict(type='LoggingCallback', log_every_n_steps=5),
-    dict(
-        type='VizualizationCallback',
-        save_dir='visualization',
-        palette=[(220, 20, 60), (0, 0, 142), (119, 11, 32)],
-        min_score_threshold=0.35,
-        interval=10)
+    dict(type='LoggingCallback')
 ]
-monitor_metric = 'coco/novel_map_50'
-train_bs = 2
+monitor_metric = 'coco/base_map_50'
+train_bs = 4
 val_bs = 1
-num_workers = 2
-epochs = 100
-save_checkpoint_interval = 10
-freq = 5
+num_workers = 4
+epochs = 50
+save_checkpoint_interval = 2
+freq = 100
 clip_max_norm = 0.1
 batch_transform = [
     dict(
@@ -384,8 +322,16 @@ batch_transform = [
                 (896, 896), (896, 896)])
 ]
 optim_wrapper = dict(
-    type='OptimWrapper',
-    optimizer=dict(type='AdamW', lr=5e-05, weight_decay=0.0001))
+    optimizer=dict(type='AdamW', lr=0.0001, weight_decay=0.0001),
+    paramwise_cfg=dict(
+        custom_keys=dict(
+            backbone=dict(lr_mult=0.1), backbone_ir=dict(lr_mult=0.1))))
 param_scheduler = [
-    dict(type='LinearLR', total_iters=10, start_factor=0.01, by_epoch=True)
+    dict(
+        type='MultiStepLR',
+        begin=0,
+        end=50,
+        by_epoch=True,
+        milestones=[45],
+        gamma=0.1)
 ]

@@ -1,0 +1,116 @@
+{
+    "images": [
+        {
+            "file_name_IR": "FLIR_02636_PreviewData.jpeg",
+            "file_name_RGB": "FLIR_02636_RGB.jpg",
+            "height": 512,
+            "width": 640,
+            "id": 2636
+        },
+        {
+            "file_name_IR": "FLIR_03115_PreviewData.jpeg",
+            "file_name_RGB": "FLIR_03115_RGB.jpg",
+            "height": 512,
+            "width": 640,
+            "id": 3115
+        },
+        {
+            "file_name_IR": "FLIR_03568_PreviewData.jpeg",
+            "file_name_RGB": "FLIR_03568_RGB.jpg",
+            "height": 512,
+            "width": 640,
+            "id": 3568
+        },
+        {
+            "file_name_IR": "FLIR_03530_PreviewData.jpeg",
+            "file_name_RGB": "FLIR_03530_RGB.jpg",
+            "height": 512,
+            "width": 640,
+            "id": 3530
+        }
+    ],
+    "annotations": [
+        {
+            "area": 23353,
+            "iscrowd": 0,
+            "bbox": [
+                224,
+                228,
+                193,
+                121
+            ],
+            "category_id": 2,
+            "ignore": 0,
+            "segmentation": [],
+            "image_id": 2636,
+            "id": 3306
+        },
+        {
+            "area": 10492,
+            "iscrowd": 0,
+            "bbox": [
+                553,
+                247,
+                86,
+                122
+            ],
+            "category_id": 1,
+            "ignore": 0,
+            "segmentation": [],
+            "image_id": 3115,
+            "id": 29586
+        },
+        {
+            "area": 1392,
+            "iscrowd": 0,
+            "bbox": [
+                51,
+                232,
+                29,
+                48
+            ],
+            "category_id": 3,
+            "ignore": 0,
+            "segmentation": [],
+            "image_id": 3568,
+            "id": 7270
+        },
+        {
+            "area": 1395,
+            "iscrowd": 0,
+            "bbox": [
+                285,
+                293,
+                45,
+                31
+            ],
+            "category_id": 4,
+            "ignore": 0,
+            "segmentation": [],
+            "image_id": 3530,
+            "id": 13515
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "none",
+            "id": 1,
+            "name": "bicycle"
+        },
+        {
+            "supercategory": "none",
+            "id": 2,
+            "name": "car"
+        },
+        {
+            "supercategory": "none",
+            "id": 3,
+            "name": "person"
+        },
+        {
+            "supercategory": "none",
+            "id": 4,
+            "name": "dog"
+        }
+    ]
+}

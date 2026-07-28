@@ -18,8 +18,8 @@ cd FSMODNet
 ```
 2. Install required packages
 ```bash
-pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
-pip install natten==0.17.5+torch260cu124 -f https://whl.natten.org
+pip install torch==2.11.0 torchvision==0.26.0 torchaudio==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+pip install natten==0.20.1+torch270cu128 -f https://whl.natten.org
 pip install -r requirements.txt
 ``` 
 3. Compiling CUDA operators
@@ -46,7 +46,7 @@ data/FLIR/
 You need to put each dataset imgs in the directory according to the train.txt and val.txt.
 ```bash
 data/M3FD/
-├── Coco_Annotations/         # COCO-style annotations for all conditions
+├── Coco_Annotations/     
 ├── train.txt
 ├── test.txt
 ├── visible/

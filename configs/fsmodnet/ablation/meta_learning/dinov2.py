@@ -17,7 +17,7 @@ metainfo = {
 }
 
 
-root = '../datasets/FLIR/'
+root = 'data/FLIR/'
 episode_size = 1
 num_episodes = 2
 num_classes = 3
